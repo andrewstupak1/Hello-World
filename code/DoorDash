@@ -1,16 +1,17 @@
---Question 1: 
+--Question 1: Write a query to calculate the average earnings per hour spent dashing by day of week.
+
 SELECT
-  -- Extract the day of the week from the dash start time as a string, e.g., 'Monday'
+  -- Extract the day of the week, e.g., 'Monday'
   DATE_FORMAT(dash_start_time, '%W') AS day_of_week,
-  -- Calculate the average earnings per hour for each day of the week by dividing the total pay by the number of hours between the start and end times of the dash.
-  AVG(total_pay / TIMESTAMPDIFF(HOUR, dash_start_time, dash_end_time)) AS avg_earnings_per_hour
+  -- Calculate the average earnings per hour for each day of the week by dividing the total pay by the total number of hours between the start and end times of the dash.
+  (SUM(total_pay) / SUM(TIMESTAMPDIFF(HOUR, dash_start_time, dash_end_time))) AS avg_earnings_per_hour
 FROM Dash
 -- Group the results by the day of the week so that we get a separate average for each day.
 GROUP BY day_of_week;
 
 
 
---QUESTION 2: 2. Write a query to see how many dashes and deliveries were generated for each zip code in submarket 13. 
+--QUESTION 2: Write a query to see how many dashes and deliveries were generated for each zip code in submarket 13. 
 
 SELECT
   -- Select the zipcode from the Dasher table.
@@ -36,7 +37,7 @@ SELECT
   -- Select the dasher ID to identify the dasher.
   dasher_id,
   -- Calculate the efficiency by finding the sum of all deliveries divided by the total hours dashed.
-  SUM(number_of_deliveries) / SUM(TIMESTAMPDIFF(HOUR, dash_start_time, dash_end_time)) AS efficiency
+  SUM(number_of_deliveries) / SUM(TIMESTAMPDIFF(MINUTE, dash_start_time, dash_end_time)) AS efficiency
 FROM Dash
 -- Filter the dashes to include only those that occurred in October 2017.
 WHERE
@@ -65,7 +66,7 @@ WITH OctAvg2ormore AS (
 ),
 TotalPay AS (
   -- Compute the total pay for all dashers in October 2017.
-  SELECT SUM(total_pay) AS total FROM OOctAvg2ormore
+  SELECT SUM(total_pay) AS total FROM OctAvg2ormore
 ),
 QualifiedDashersPay AS (
   -- Compute the total pay for dashers who averaged 2 or more deliveries per hour.
